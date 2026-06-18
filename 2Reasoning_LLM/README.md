@@ -1,68 +1,78 @@
-# Khipus.ai
-## Reasoning  LLM
-### Assignment 2: DeepSeek Chatbot
+# Khipus AI — Demos para webinar
 
+Demos listas para presentar el tema: **El nuevo rol del profesional Tech en la era de la IA Generativa**.
 
-This Assignment is a Flask-based web app that integrates with Azure's AI Inference to provide a chatbot experience with incremental streaming of responses. Follow these instructions to run the repository on your local environment.
+Incluye dos variantes:
 
-## Prerequisites
+1. `terminal_demo.py`: demo por consola.
+2. `ui_demo.py`: demo web con Flask.
 
-- Python 3.11 or later
-- [pip](https://pip.pypa.io/en/stable/)
-- (Optional) [venv](https://docs.python.org/3/library/venv.html) for creating virtual environments
+## Importante sobre el razonamiento visible
 
-## Setup Instructions
+La demo permite mostrar un bloque llamado **Razonamiento visible del agente**.
 
-1. **Clone the repository (if needed)**
-   ```bash
-   git clone <repository-url>
-   cd DeepSeek_chatbot
-   ```
+Ese bloque no es cadena de pensamiento interna oculta. Es una trazabilidad breve, segura y presentable para explicar a la audiencia cómo se orientó la respuesta.
 
-2. **Create and activate a virtual environment**
-   ```bash
-   python -m venv venv
-   ```
-   On Windows, activate the virtual environment with:
-   ```bash
-   venv\Scripts\activate
-   ```
+Esto es más profesional para un webinar porque permite transparencia sin exponer deliberaciones internas extensas.
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Instalación
 
-4. **Configure environment variables**
-
-   Create a `.env` file in the root folder (if not already present) and add the following variables. Replace the placeholder values with your actual Azure endpoint and key:
-   ```env
-   AZURE_ENDPOINT=https://your-azure-endpoint
-   AZURE_KEY=your-azure-key
-   ```
-
-## Running the App
-
-The repository contains two main Python files:
-
-- **`chat.py`**: A standalone script demonstrating a simple Azure chat call.
-- **`app.py`**: A Flask web application that streams chat responses to a web client.
-
-To run the Flask web app locally, execute:
 ```bash
-python app.py
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
 ```
-By default, the app will start on `http://127.0.0.1:5000/`.
 
-## Using the App
+Edita `.env` con tu endpoint, clave nueva y deployment:
 
-- Open your browser and navigate to `http://127.0.0.1:5000/`.
-- Type your message in the input box and press **Send**.
-- The app will display the response from Azure along with internal reasoning wrapped in `<think>...</think>`.
+```env
+AZURE_ENDPOINT=https://<tu-recurso>.services.ai.azure.com/openai/v1
+AZURE_KEY=<tu-clave-regenerada>
+AZURE_DEPLOYMENT=DeepSeek-V3.2
+```
 
-## Troubleshooting
+## Demo terminal
 
-- **Environment Variables:** Ensure your `.env` file is in the same directory as `app.py` and contains correct values.
-- **Dependency Issues:** If installation of dependencies fails, ensure you are using the correct Python version.
+```bash
+python terminal_demo.py
+```
 
+Comandos útiles:
 
+```txt
+/ayuda
+/config
+/razonamiento on
+/razonamiento off
+/limpiar
+/salir
+```
+
+## Demo UI
+
+```bash
+python ui_demo.py
+```
+
+Abrir:
+
+```txt
+http://127.0.0.1:5000
+```
+
+La UI incluye:
+
+- Modo general.
+- Modo ingeniería / arquitectura.
+- Modo valor de negocio.
+- Modo docencia.
+- Toggle para mostrar u ocultar el razonamiento visible.
+- Streaming de respuesta.
+- Branding Khipus.
+
+## Seguridad
+
+No imprimas `AZURE_KEY` en consola.
+No subas `.env` a repositorios.
+Si una clave fue compartida por error, regénérala antes de usar la demo.
