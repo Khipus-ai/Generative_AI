@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Khipus AI — Demo Webinar</title>
+  <style>
+    :root{
+      --bg:#020817;
+      --panel:#071226;
+      --panel-2:#0b1a2f;
+      --text:#e6f7ff;
+      --muted:#92a7b8;
+      --accent:#28d0b0;
+      --accent-2:#38bdf8;
+      --warning:#facc15;
+      --danger:#f87171;
+      --border:rgba(255,255,255,.09);
+      --glass:rgba(255,255,255,.055);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(40,208,176,.18), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(56,189,248,.16), transparent 30%),
+        linear-gradient(180deg, #020817, #06101f 58%, #020817);
+    }
+    .page{width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:28px 0 36px}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:24px}
+    .brand{display:flex; align-items:center; gap:16px}
+    .brand img{width:190px; max-width:45vw; object-fit:contain}
+    .badge{border:1px solid var(--border); padding:9px 12px; border-radius:999px; color:var(--muted); background:rgba(255,255,255,.035); font-size:13px}
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:24px; margin-bottom:24px; align-items:stretch}
+    .hero-card,.side-card,.chat-card{border:1px solid var(--border); border-radius:24px; background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)); box-shadow:0 24px 70px rgba(0,0,0,.34); backdrop-filter:blur(14px)}
+    .hero-card{padding:34px; position:relative; overflow:hidden; min-height:260px}
+    .hero-card:after{content:""; position:absolute; right:-90px; top:-100px; width:310px; height:310px; background:radial-gradient(circle, rgba(40,208,176,.35), transparent 65%); filter:blur(4px)}
+    .kicker{letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:800; font-size:12px; margin-bottom:14px}
+    h1{font-size:clamp(34px, 5vw, 58px); line-height:1.02; margin:0 0 16px; max-width:720px}
+    .lead{font-size:18px; line-height:1.6; color:#cfe3ef; max-width:760px; margin:0}
+    .side-card{padding:24px; display:flex; flex-direction:column; justify-content:space-between; gap:22px}
+    .avatar-wrap{display:flex; justify-content:center; padding-top:8px}
+    .avatar-wrap img{width:150px; height:150px; object-fit:contain; filter:drop-shadow(0 0 24px rgba(40,208,176,.34))}
+    .metric-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .metric{padding:14px; border:1px solid var(--border); border-radius:16px; background:rgba(0,0,0,.2)}
+    .metric strong{display:block; font-size:20px; color:white}
+    .metric span{font-size:12px; color:var(--muted)}
+    .chat-card{display:grid; grid-template-columns:1fr 330px; overflow:hidden; min-height:600px}
+    .chat-main{padding:24px}
+    .chat-head{display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:16px}
+    .chat-title h2{margin:0 0 6px; font-size:23px}
+    .chat-title p{margin:0; color:var(--muted); line-height:1.45}
+    .messages{height:460px; overflow:auto; padding:18px; border:1px solid var(--border); border-radius:18px; background:rgba(0,0,0,.2); scroll-behavior:smooth}
+    .msg{display:flex; gap:12px; margin-bottom:15px; align-items:flex-start}
+    .msg.user{justify-content:flex-end}
+    .bubble{max-width:86%; border-radius:18px; padding:13px 15px; line-height:1.55; white-space:normal}
+    .bubble.user{background:linear-gradient(135deg, rgba(40,208,176,.20), rgba(56,189,248,.14)); border:1px solid rgba(40,208,176,.28)}
+    .bubble.ai{background:rgba(255,255,255,.94); color:#06101f; border:1px solid rgba(255,255,255,.4)}
+    .bubble.ai p:first-child{margin-top:0}.bubble.ai p:last-child{margin-bottom:0}
+    .who{width:36px; height:36px; flex:0 0 36px; display:grid; place-items:center; border-radius:12px; background:var(--glass); color:white; border:1px solid var(--border); font-weight:800; font-size:12px}
+    .reasoning-card{display:none; margin-bottom:12px; padding:12px 14px; border-radius:14px; border:1px solid rgba(250,204,21,.35); background:linear-gradient(180deg, rgba(250,204,21,.13), rgba(250,204,21,.05)); color:#271c02}
+    .reasoning-card.visible{display:block}
+    .reasoning-title{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:900; margin-bottom:6px; color:#6d4b00; text-transform:uppercase; letter-spacing:.05em}
+    .answer-title{font-size:12px; font-weight:900; color:#0b5e56; text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px}
+    .composer{display:grid; grid-template-columns:1fr auto; gap:10px; margin-top:14px}
+    textarea{width:100%; min-height:54px; max-height:140px; resize:vertical; border-radius:16px; padding:14px 16px; background:rgba(0,0,0,.24); border:1px solid var(--border); color:white; font:inherit; outline:none}
+    textarea:focus{border-color:rgba(40,208,176,.55); box-shadow:0 0 0 3px rgba(40,208,176,.12)}
+    button{border:none; border-radius:16px; padding:0 22px; font-weight:800; cursor:pointer; color:#02120f; background:linear-gradient(135deg, var(--accent), var(--accent-2)); transition:transform .12s ease, opacity .12s ease}
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.55; cursor:not-allowed; transform:none}
+    .sidebar{border-left:1px solid var(--border); background:rgba(0,0,0,.16); padding:24px}
+    .sidebar h3{margin:0 0 10px}.sidebar p{color:var(--muted); line-height:1.5; margin-top:0}
+    .mode-list{display:grid; gap:10px; margin:14px 0 22px}
+    .mode{display:flex; gap:10px; align-items:center; padding:12px; border:1px solid var(--border); border-radius:16px; cursor:pointer; background:rgba(255,255,255,.035)}
+    .mode input{accent-color:var(--accent)}
+    .toggle{display:flex; gap:10px; align-items:flex-start; padding:12px; border:1px solid rgba(250,204,21,.28); border-radius:16px; background:rgba(250,204,21,.08); margin-bottom:22px}
+    .toggle input{margin-top:3px; accent-color:var(--warning)}
+    .toggle strong{display:block; font-size:14px; color:#fff5bf; margin-bottom:3px}
+    .toggle span{display:block; color:var(--muted); font-size:12px; line-height:1.35}
+    .chips{display:grid; gap:10px}
+    .chip{padding:11px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(255,255,255,.035); color:#dff7ff; cursor:pointer; font-size:13px; line-height:1.35}
+    .status{font-size:13px; color:var(--muted); margin-top:12px}
+    code{background:rgba(2,8,23,.12); padding:2px 5px; border-radius:6px}
+    pre{background:#071226; color:#dff7ff; padding:12px; border-radius:12px; overflow:auto}
+    @media (max-width:950px){.hero,.chat-card{grid-template-columns:1fr}.sidebar{border-left:none; border-top:1px solid var(--border)}.messages{height:390px}.topbar{align-items:flex-start; flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="topbar">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='khipus_logo.png') }}" alt="Khipus.ai" />
+      </div>
+      <div class="badge">{{ deployment }} · {{ endpoint_host }}</div>
+    </section>
+
+    <section class="hero">
+      <article class="hero-card">
+        <div class="kicker">Demo para webinar</div>
+        <h1>Del uso de IA a soluciones reales</h1>
+        <p class="lead">Una interfaz simple para mostrar cómo un profesional Tech puede usar IA Generativa con criterio: explicar, diseñar, validar y conectar tecnología con impacto.</p>
+      </article>
+      <aside class="side-card">
+        <div class="avatar-wrap"><img src="{{ url_for('static', filename='khipus_avatar.png') }}" alt="Khipus avatar" /></div>
+        <div class="metric-grid">
+          <div class="metric"><strong>5</strong><span>capacidades clave</span></div>
+          <div class="metric"><strong>3</strong><span>niveles de madurez</span></div>
+          <div class="metric"><strong>IA</strong><span>como copiloto</span></div>
+          <div class="metric"><strong>Tech</strong><span>con criterio</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="chat-card">
+      <div class="chat-main">
+        <div class="chat-head">
+          <div class="chat-title">
+            <h2>Asistente técnico Khipus AI</h2>
+            <p>Haz una pregunta o usa un ejemplo. La respuesta se transmite en vivo y puede mostrar una trazabilidad visible, breve y segura.</p>
+          </div>
+        </div>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form class="composer" id="chatForm">
+          <textarea id="messageInput" placeholder="Ej.: Explica Deep Learning para profesionales de software..."></textarea>
+          <button id="sendButton" type="submit">Enviar</button>
+        </form>
+        <div id="status" class="status">Listo</div>
+      </div>
+
+      <aside class="sidebar">
+        <h3>Modo de demo</h3>
+        <p>Cambia el ángulo de la respuesta según lo que quieras mostrar en vivo.</p>
+        <div class="mode-list">
+          <label class="mode"><input type="radio" name="mode" value="general" checked> General</label>
+          <label class="mode"><input type="radio" name="mode" value="ingenieria"> Ingeniería / arquitectura</label>
+          <label class="mode"><input type="radio" name="mode" value="negocio"> Valor de negocio</label>
+          <label class="mode"><input type="radio" name="mode" value="docencia"> Explicación didáctica</label>
+        </div>
+
+        <label class="toggle">
+          <input id="reasoningToggle" type="checkbox" checked>
+          <span>
+            <strong>Mostrar razonamiento visible</strong>
+            <span>Trazabilidad breve para la audiencia. No expone cadena de pensamiento interna.</span>
+          </span>
+        </label>
+
+        <h3>Prompts rápidos</h3>
+        <div class="chips">
+          <div class="chip" data-prompt="Explica qué es Deep Learning con una analogía para profesionales Tech.">¿Qué es Deep Learning?</div>
+          <div class="chip" data-prompt="Convierte este proceso en una solución con IA: revisar manualmente documentos de clientes y extraer riesgos principales.">Proceso manual → solución IA</div>
+          <div class="chip" data-prompt="Dame una arquitectura simple para integrar un LLM en una aplicación empresarial, incluyendo riesgos y validación.">Arquitectura con LLM</div>
+          <div class="chip" data-prompt="Explica los 3 niveles de madurez: usuario de IA, profesional aumentado y constructor de soluciones con IA.">3 niveles de madurez</div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const messages = document.getElementById('messages');
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('messageInput');
+    const button = document.getElementById('sendButton');
+    const statusEl = document.getElementById('status');
+    const reasoningToggle = document.getElementById('reasoningToggle');
+
+    function escapeHtml(str){
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function renderMarkdown(md){
+      let text = escapeHtml(md || '');
+      text = text.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code}</code></pre>`);
+      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+      text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+      text = text.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+      text = text.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+      text = text.replace(/^- (.*)$/gm, '• $1');
+      return text.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+    }
+    function selectedMode(){
+      return document.querySelector('input[name="mode"]:checked').value;
+    }
+    function addMessage(text, who){
+      const row = document.createElement('div');
+      row.className = `msg ${who}`;
+      const avatar = document.createElement('div');
+      avatar.className = 'who';
+      avatar.textContent = who === 'user' ? 'Tú' : 'AI';
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${who === 'user' ? 'user' : 'ai'}`;
+      if(who === 'ai') bubble.innerHTML = renderMarkdown(text);
+      else bubble.textContent = text;
+      if(who === 'user') { row.appendChild(bubble); row.appendChild(avatar); }
+      else { row.appendChild(avatar); row.appendChild(bubble); }
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+      return bubble;
+    }
+
+    function addAiStructuredMessage(){
+      const row = document.createElement('div');
+      row.className = 'msg ai';
+      const avatar = document.createElement('div');
+      avatar.className = 'who';
+      avatar.textContent = 'AI';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble ai';
+
+      const reasoning = document.createElement('div');
+      reasoning.className = 'reasoning-card';
+      reasoning.innerHTML = '<div class="reasoning-title">Razonamiento visible del agente</div><div class="reasoning-content"></div>';
+
+      const answerTitle = document.createElement('div');
+      answerTitle.className = 'answer-title';
+      answerTitle.textContent = 'Respuesta final';
+      const answer = document.createElement('div');
+      answer.className = 'answer-content';
+
+      bubble.appendChild(reasoning);
+      bubble.appendChild(answerTitle);
+      bubble.appendChild(answer);
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+
+      return {
+        reasoningBox: reasoning,
+        reasoningContent: reasoning.querySelector('.reasoning-content'),
+        answer,
+      };
+    }
+
+    function parseStructured(raw){
+      const text = raw || '';
+      const reasoningStart = text.toLowerCase().indexOf('<razonamiento_visible>');
+      const reasoningEnd = text.toLowerCase().indexOf('</razonamiento_visible>');
+      const answerStart = text.toLowerCase().indexOf('<respuesta>');
+      const answerEnd = text.toLowerCase().indexOf('</respuesta>');
+
+      let reasoning = '';
+      let answer = '';
+
+      if(reasoningStart !== -1){
+        const from = reasoningStart + '<razonamiento_visible>'.length;
+        const to = reasoningEnd !== -1 ? reasoningEnd : text.length;
+        reasoning = text.slice(from, to).trim();
+      }
+
+      if(answerStart !== -1){
+        const from = answerStart + '<respuesta>'.length;
+        const to = answerEnd !== -1 ? answerEnd : text.length;
+        answer = text.slice(from, to).trim();
+      } else {
+        // Mientras aún no llega la etiqueta <respuesta>, evita mostrar tags crudos.
+        if(reasoningStart === -1) answer = text.trim();
+      }
+
+      answer = answer.replace(/<\/?respuesta>/gi, '').replace(/<\/?razonamiento_visible>/gi, '').trim();
+      reasoning = reasoning.replace(/<\/?respuesta>/gi, '').replace(/<\/?razonamiento_visible>/gi, '').trim();
+      return {reasoning, answer};
+    }
+
+    async function sendMessage(message){
+      const clean = message.trim();
+      if(!clean) return;
+      addMessage(clean, 'user');
+      input.value = '';
+      input.disabled = true; button.disabled = true; statusEl.textContent = 'Generando respuesta...';
+      const ui = addAiStructuredMessage();
+      let buffer = '';
+      try{
+        const res = await fetch('/api/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({message: clean, mode: selectedMode(), showReasoning: reasoningToggle.checked})
+        });
+        if(!res.ok){
+          ui.answer.innerHTML = renderMarkdown(`Error del servidor: ${res.status}`);
+          return;
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        while(true){
+          const {value, done} = await reader.read();
+          if(done) break;
+          buffer += decoder.decode(value, {stream:true});
+          const parsed = parseStructured(buffer);
+          if(parsed.reasoning){
+            ui.reasoningBox.classList.add('visible');
+            ui.reasoningContent.innerHTML = renderMarkdown(parsed.reasoning);
+          }
+          ui.answer.innerHTML = renderMarkdown(parsed.answer || 'Generando respuesta...');
+          messages.scrollTop = messages.scrollHeight;
+        }
+      } catch(err){
+        ui.answer.innerHTML = renderMarkdown(`Error de red o interno: ${err.message || err}`);
+      } finally {
+        input.disabled = false; button.disabled = false; statusEl.textContent = 'Listo'; input.focus();
+      }
+    }
+
+    form.addEventListener('submit', e => { e.preventDefault(); sendMessage(input.value); });
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); form.requestSubmit(); }
+    });
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => { input.value = chip.dataset.prompt; input.focus(); });
+    });
+
+    addMessage('Hola. Estoy listo para ayudarte a mostrar cómo un profesional Tech puede pasar de usar IA a construir soluciones con IA. Puedes activar o desactivar el razonamiento visible desde el panel derecho.', 'ai');
+  </script>
+</body>
+</html>
