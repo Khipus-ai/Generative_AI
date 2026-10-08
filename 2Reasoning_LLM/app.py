@@ -1,21 +1,20 @@
 import os
 import re
 from flask import Flask, request, Response, render_template_string
-from azure.ai.inference import ChatCompletionsClient
-from azure.core.credentials import AzureKeyCredential
 from dotenv import load_dotenv
-from azure.ai.inference.models import SystemMessage, UserMessage
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-# Initialize the ChatCompletionsClient
-client = ChatCompletionsClient(
-    endpoint=os.environ["AZURE_ENDPOINT"],
-    credential=AzureKeyCredential(os.environ["AZURE_KEY"]),
+# El endpoint Azure OpenAI v1 (.../openai/v1/) no usa api-version.
+client = OpenAI(
+    base_url=os.environ["AZURE_ENDPOINT"].rstrip("/") + "/",
+    api_key=os.environ["AZURE_KEY"],
 )
+MODEL = os.getenv("AZURE_MODEL", "gpt-4.1-mini")  # nombre del despliegue
 
 @app.route('/')
 def home():
@@ -348,15 +347,14 @@ def chat():
     user_message = data['message']
 
     messages = [
-        SystemMessage(content="You are a helpful assistant. Include internal reasoning wrapped in <think>...</think> before providing the final answer."),
-        UserMessage(content=user_message),
+        {"role": "system", "content": "You are a helpful assistant. Include internal reasoning wrapped in <think>...</think> before providing the final answer."},
+        {"role": "user", "content": user_message},
     ]
 
-    # Add the model parameter to the call
-    stream = client.complete(
+    stream = client.chat.completions.create(
+        model=MODEL,
         messages=messages,
-        model="DeepSeek-R1",  # Specify your deployment model
-        stream=True
+        stream=True,
     )
 
     def generate():

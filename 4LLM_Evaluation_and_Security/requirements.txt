@@ -1,0 +1,4 @@
+azure-ai-evaluation==1.18.7
+nltk>=3.9.1,<4
+ipykernel>=6,<8
+jupyterlab>=4,<5

@@ -1,0 +1,4 @@
+# SDK para el endpoint Azure OpenAI v1 existente.
+openai>=1.99.9,<3
+jupyterlab>=4,<5
+ipykernel>=6,<8
